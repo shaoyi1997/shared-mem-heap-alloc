@@ -39,7 +39,8 @@ shmheap_memory_handle shmheap_connect(const char *name) {
     int fd = shm_open(name, O_RDWR, 0);
     shmheap_block *mem = (shmheap_block *) mmap(NULL, sizeof(shmheap_block), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     size_t len = mem->len;
-    mem = (shmheap_block *) mremap(mem, sizeof(shmheap_block), len, MREMAP_MAYMOVE);
+    munmap(mem, sizeof(shmheap_block));
+    mem = (shmheap_block *)mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     close(fd);
     // note: do we need to mprotect the new pages?
     return mem;
